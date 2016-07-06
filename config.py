@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# # 用户个人信息配置
-# uid = "24238285"
-# id = "C3D680D6B15EEE17BCB2BF24419A8F82"
-# idfa = "37B9B63C-FCF7-4D47-854E-FD17D606E300"
-# openid = "oFfv-s7eYZ8n7Z6buxKiMhql7ehE"
-
 # 请求配置
 req_break = 15
 success_break = 450
@@ -22,5 +16,8 @@ appsecret = "121ed8930e99a520e3ff7db796f17031"
 got_template = "1__R1cYGbMhB-ucp5cZsRm3pDP92BoTSusTPct7O6pM"
 down_template = "PPhNn2FK9kz1bY689FVyCxFdl4BMVSXMVYYX6gsPOpo"
 
-# 日志配置
+# 程序配置
 log_prefix = ""
+broker = "sqla+sqlite:///celerydb.data"
+backend = "db+sqlite:///celerydb_results.data"
+database_str = "sqlite:///data.data"

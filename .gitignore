@@ -1,3 +1,6 @@
 *.pyc
 requests/*
 *.conf
+.vscode/*
+*.data
+*.txt
