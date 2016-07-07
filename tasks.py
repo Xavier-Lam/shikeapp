@@ -48,10 +48,17 @@ def run(self, client, user):
             if collected:
                 delay = config.success_break
         logger.info("Task complete: " + client.uid)
-        run.apply_async((client,), countdown=delay)
+        run.apply_async((client, user), countdown=delay)
     except Exception as e:
         logger.error("An error occured: " + str(e))
         self.retry(exe=e, countdown=delay)
+
+# @app.task
+# def monitor():
+#     with open("errlog.txt") as f:
+#         lines = f.readlines()
+#         pattern = r"[(?<level>\w+)]\s+(?<name>\w+)\s+(.*)"
+#         # records = map(lambda o: )
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
