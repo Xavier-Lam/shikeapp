@@ -4,3 +4,4 @@ requests/*
 .vscode/*
 *.data
 *.txt
+python34/*

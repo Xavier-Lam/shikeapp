@@ -21,6 +21,11 @@ def init_log():
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+    # 调试异常处理器
+    ch = logging.FileHandler(config.log_prefix + "debuglog.txt", "a")
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 # def init_log(uid):
 #     """日志配置"""

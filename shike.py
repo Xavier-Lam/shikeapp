@@ -50,6 +50,7 @@ class ShikeClient(object):
             match = re.search(r"r=(.*)'", ele.attrib["onclick"])
         if not match:
             logger.critical("Init failed!")
+            raise Exception("Init failed!")
         token = match.group(1)
         # 转到appList首页
         lasturl = self.baseaddr + "/itry/desktop?r=" + token
