@@ -55,7 +55,7 @@ class WeChatApiClient(object):
             code = json.get("errcode")
             if code:
                 if self.on_wechaterror:
-                    self.wechat_error(resp, code)
+                    self.on_wechaterror(resp, code)
             else:
                 self.__accesstoken = json["access_token"]
                 expires_in = json.get("expires_in") or 7200
