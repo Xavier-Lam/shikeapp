@@ -59,4 +59,13 @@ if __name__ == "__main__":
 
     elif arg == "celery":
         os.remove("celerydb.data")
+        
+        session = Session()
+        users = session.query(User).all()
+
+        for user in users:    
+            client = ShikeClient(user.uid, user.key, user.idfa)
+            client.init()
+            run.delay(client, user)
+
         os.system("celery -A tasks worker --loglevel=info")

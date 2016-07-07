@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
 import logging
+import re
 
 from celery import Celery
 
@@ -14,7 +16,7 @@ app = Celery("tasks", broker=config.broker, backend=config.backend)
 
 @app.task(bind=True)
 def run(self, client, user):
-    logger.info("Task starts: " + client.uid)
+    logger = logging.getLogger("shike." + user.uid)
     delay = config.req_break
     try:
         apps = client.load_apps()
@@ -47,33 +49,48 @@ def run(self, client, user):
                 
             if collected:
                 delay = config.success_break
-        logger.info("Task complete: " + client.uid)
         run.apply_async((client, user), countdown=delay)
     except Exception as e:
         logger.error("An error occured: " + str(e))
         self.retry(exe=e, countdown=delay)
 
-# @app.task
-# def monitor():
-#     with open("errlog.txt") as f:
-#         lines = f.readlines()
-#         pattern = r"[(?<level>\w+)]\s+(?<name>\w+)\s+(.*)"
-#         # records = map(lambda o: )
+@app.task
+def monitor():
+    with open("errlog.txt") as f:
+        lines = f.readlines()
+        pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
+        records = list(map(lambda o: re.search(pattern, o).groupdict(), lines))
+        for record in records:
+            record["date"] = datetime.strptime("2016-" + record["date"], "%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        # 检查过去5分钟的异常数
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARN", records))
+        num = len(excs)
+        if num > config.alert_num1:
+            send_wechat_msg(config.alert_openid, config.alert_template, "",
+                keyword1="error", keyword2=num, keyword3=excs[-1]["msg"])
+        # 检查过去30分钟的日志数
+        excs = filter(lambda o: now - o["date"] < timedelta(minutes=30), records)
+        num = len(list(excs))
+        if num > config.alert_num2:
+            send_wechat_msg(config.alert_openid, config.alert_template, "",
+                keyword1="warning", keyword2=num, keyword3=excs[-1]["msg"])
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
     resp, code = post_template_message(wechat,
         openid, template_id, url, **kwargs)
     if code:
-        logger.error("WeChatError: " + str(resp))
+        main_logger.error("WeChatError: " + str(resp))
     else:
-        logger.info("WeChatSendSuccess: " + str(resp))
+        main_logger.info("WeChatSendSuccess: " + str(resp))
   
 # 初始化微信ApiClient  
 wechat = WeChatApiClient(config.appid, config.appsecret)
-wechat.on_servererror = lambda resp, *args, **kwargs: logger.error(str(resp.text))
-wechat.on_wechaterror = lambda resp, *args, **kwargs: logger.error(str(resp.text))
+wechat.on_servererror = lambda resp, *args, **kwargs: main_logger.error(str(resp.text))
+wechat.on_wechaterror = lambda resp, *args, **kwargs: main_logger.error(str(resp.text))
+wechat.on_wechatgranted = lambda resp, *args, **kwargs: main_logger.info("微信token更新: " + str(resp.text))
 
 # 初始化日志
 init_log()
-logger = logging.getLogger("shike")
+main_logger = logging.getLogger("shike")

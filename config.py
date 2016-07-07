@@ -21,3 +21,10 @@ log_prefix = ""
 broker = "sqla+sqlite:///celerydb.data"
 backend = "db+sqlite:///celerydb_results.data"
 database_str = "sqlite:///data.data"
+
+# 监控配置
+monitor_break = 300
+alart_num1 = 5
+alert_num2 = 100
+alert_openid = "oFfv-s7eYZ8n7Z6buxKiMhql7ehE"
+alert_template = "tFeAoZZfqm_ova3GBBMIwmsujynWCprddxivFFAyry4"
