@@ -61,7 +61,7 @@ class WeChatApiClient(object):
                 expires_in = json.get("expires_in") or 7200
                 # 更新外部token
                 if self.on_wechatgranted:
-                    self.on_wechategranted(resp, self.__accesstoken, expires_in)
+                    self.on_wechatgranted(resp, self.__accesstoken, expires_in)
                 self._update_accesstoken(self.__accesstoken, expires_in)
         except Exception as e:
             if self.on_servererror:

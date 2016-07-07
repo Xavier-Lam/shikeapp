@@ -87,7 +87,7 @@ def send_wechat_msg(openid, template_id, url="", **kwargs):
   
 # 初始化微信ApiClient  
 wechat = WeChatApiClient(config.appid, config.appsecret)
-wechat.on_servererror = lambda resp, *args, **kwargs: main_logger.error("WeChatServerError: " + str(resp.text))
+wechat.on_servererror = lambda resp, *args, **kwargs: main_logger.error("WeChatServerError: " + str(args[1]))
 wechat.on_wechaterror = lambda resp, *args, **kwargs: main_logger.error("WeChatClientError: " + str(resp.text))
 wechat.on_wechatgranted = lambda resp, *args, **kwargs: main_logger.info("微信token更新: " + str(resp.text))
 
