@@ -12,8 +12,6 @@ from tasks import run
 if __name__ == "__main__":
     arg = sys.argv[1]
 
-    init_log()
-
     if arg == "init":
         from model import engine, Model
 
@@ -58,8 +56,11 @@ if __name__ == "__main__":
             run.delay(client, user)
 
     elif arg == "celery":
-        os.remove("celerydb.data")
-        
+        try:
+            os.remove("celerydb.data")
+        except OSError:
+            pass
+
         session = Session()
         users = session.query(User).all()
 
