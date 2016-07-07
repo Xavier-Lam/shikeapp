@@ -14,6 +14,7 @@ app = Celery("tasks", broker=config.broker, backend=config.backend)
 
 @app.task(bind=True)
 def run(self, client):
+    logger.info("Task starts: " + client.uid)
     delay = config.req_break
     try:
         apps = client.load_apps()
@@ -46,6 +47,7 @@ def run(self, client):
                 
             if collected:
                 delay = config.success_break
+        logger.info("Task complete: " + client.uid)
         run.apply_async((client,), countdown=delay)
     except Exception as e:
         logger.error("An error occured: " + str(e))

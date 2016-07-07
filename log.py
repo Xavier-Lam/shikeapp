@@ -22,7 +22,7 @@ def init_log():
     ch.setFormatter(formatter)
     logger.addHandler(ch)
     # 调试异常处理器
-    ch = logging.FileHandler(config.log_prefix + "debuglog.txt", "a")
+    ch = logging.FileHandler(config.log_prefix + "debuglog.txt", "w")
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
     logger.addHandler(ch)

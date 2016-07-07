@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 
+import config
 from log import init_log
 from model import Session, User
 from shike import ShikeClient
@@ -50,3 +52,7 @@ if __name__ == "__main__":
             client = ShikeClient(user.uid, user.key, user.idfa)
             client.init()
             run.delay(client)
+
+    elif arg == "celery":
+        os.remove("celerydb.data")
+        os.system("celery -A tasks worker --loglevel=info")
