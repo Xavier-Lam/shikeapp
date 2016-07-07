@@ -104,14 +104,14 @@ class WeChatApiClient(object):
             if code:
                 # 处理异常
                 if self.on_wechaterror:
-                    self.wechat_error(resp, code)
+                    self.on_wechaterror(resp, code)
                 resp = self._handleerror(json, code)
                 if resp:
                     json = resp.json()
                     code = int(json.get("errcode")) or 0
                     if code:
                         if self.on_wechaterror:
-                            self.wechat_error(resp, code)
+                            self.on_wechaterror(resp, code)
                     else:
                         # 成功处理
                         rv = (json, code)
