@@ -14,6 +14,8 @@ import requests
 
 import config
 
+logger = logging.getLogger("shike")
+
 def getnow():
     return str(int(time.time()*1000))
 
@@ -27,7 +29,6 @@ class ShikeClient(object):
         self.uid = uid
         self.id = id
         self.idfa = idfa
-        self.logger = logging.getLogger("shike." + uid)
 
     def init(self):
         """初始化"""
@@ -48,7 +49,7 @@ class ShikeClient(object):
             ele = sel(html)[0]
             match = re.search(r"r=(.*)'", ele.attrib["onclick"])
         if not match:
-            self.logger.critical("Init failed!")
+            logger.critical("Init failed!")
             raise Exception("Init failed!")
         token = match.group(1)
         # 转到appList首页
@@ -70,12 +71,12 @@ class ShikeClient(object):
                 })
             rv = resp.json()
         except requests.exceptions.ConnectionError as e:
-            self.logger.warning("ConnectionError: " + str(e))
+            logger.warning("ConnectionError: " + str(e))
         except Exception as e:
-            self.logger.error("UnexceptError: " + str(e))
+            logger.error("UnexceptError: " + str(e))
         if resp.status_code != requests.codes.ok:
-            self.logger.error("ServerError: " + resp.text)
-        self.logger.debug("Success: " + resp.text)
+            logger.error("ServerError: " + resp.text)
+        logger.debug("Success: " + resp.text)
         return rv
 
     def filter_apps(self, data):
@@ -102,14 +103,14 @@ class ShikeClient(object):
             t=getnow()
         ))
         if resp.text != "0":
-            self.logger.warning("任务领取失败: " + resp.text)
+            logger.warning("任务领取失败: " + resp.text)
             return False
 
         # 任务领取成功 下一步
         detail_url = self.baseaddr + "/shike/appDetails/%s/%s/%s?ds=r0"%(appid, order_id, self.id)
         resp = self.s.get(detail_url, headers={"User-Agent": self.ua})
         if not re.search(r'id="copy_key"', resp.text):
-            self.logger.warning("进入详情页失败: " + resp.text)
+            logger.warning("进入详情页失败: " + resp.text)
             return False
         
         # 进入详情页成功
@@ -120,10 +121,10 @@ class ShikeClient(object):
             t=getnow()
         ))
         if resp.text == "0":
-            self.logger.info("领取任务成功! " + app["name"])
+            logger.info("领取任务成功! " + app["name"])
             return True
         else:
-            self.logger.warning("复制关键词失败: " + resp.text)
+            logger.warning("复制关键词失败: " + resp.text)
             return False
 
     def get_app_status(self, app):
@@ -137,5 +138,5 @@ class ShikeClient(object):
             data = {}
         flg = data.get("flg")
         if not flg:
-            self.logger.warning("获取应用状态失败: " + resp.text)
+            logger.warning("获取应用状态失败: " + resp.text)
         return flg
