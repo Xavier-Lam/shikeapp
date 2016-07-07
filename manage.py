@@ -37,11 +37,15 @@ if __name__ == "__main__":
         user5 = User(name="apache", uid="24100028", key="20CACDC7AC201F2DB7D1201984F3BBAA",
             idfa="A3AF8EC0-974C-415E-8F62-03196B59A923", 
             openid="oFfv-s2cYU9GaX1Kz98ki5RoRsAk")
+        user6 = User(name="czd", uid="24839995", key="23A5793304CE1B63A222254C98738FF8",
+            idfa="AC07D175-D624-4872-9071-4DA7B3695594",
+            openid="oFfv-s8f5RhGss5m1Z2FsDgNCXIg")
         session.add(user1)
         session.add(user2)
         session.add(user3)
         session.add(user4)
         session.add(user5)
+        session.add(user6)
         session.commit()
 
     elif arg == "run":
@@ -51,7 +55,7 @@ if __name__ == "__main__":
         for user in users:    
             client = ShikeClient(user.uid, user.key, user.idfa)
             client.init()
-            run.delay(client)
+            run.delay(client, user)
 
     elif arg == "celery":
         os.remove("celerydb.data")

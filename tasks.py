@@ -6,14 +6,14 @@ from celery import Celery
 
 import config
 from log import init_log
-from model import Session, User
+from model import User
 from shike import ShikeClient
 from wechat import post_template_message, WeChatApiClient
 
 app = Celery("tasks", broker=config.broker, backend=config.backend)
 
 @app.task(bind=True)
-def run(self, client):
+def run(self, client, user):
     logger.info("Task starts: " + client.uid)
     delay = config.req_break
     try:
@@ -70,5 +70,3 @@ wechat.on_wechaterror = lambda resp, *args, **kwargs: logger.error(str(resp.text
 # 初始化日志
 init_log()
 logger = logging.getLogger("shike")
-
-session = Session()
