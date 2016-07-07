@@ -99,7 +99,7 @@ class WeChatApiClient(object):
         """处理一般返回"""
         try:
             json = resp.json()
-            code = json.get("errcode") or 0
+            code = int(json.get("errcode")) or 0
             rv = (json, code)
             if code:
                 # 处理异常
@@ -108,7 +108,7 @@ class WeChatApiClient(object):
                 resp = self._handleerror(json, code)
                 if resp:
                     json = resp.json()
-                    code = json.get("errcode") or 0
+                    code = int(json.get("errcode")) or 0
                     if code:
                         if self.on_wechaterror:
                             self.wechat_error(resp, code)

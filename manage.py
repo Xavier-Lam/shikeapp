@@ -38,12 +38,16 @@ if __name__ == "__main__":
         user6 = User(name="czd", uid="24839995", key="23A5793304CE1B63A222254C98738FF8",
             idfa="AC07D175-D624-4872-9071-4DA7B3695594",
             openid="oFfv-s8f5RhGss5m1Z2FsDgNCXIg")
+        user7 = User(name="lft", uid="24260077", key="7DCF1968B8BE79447536C4A015AFD8E5",
+            idfa="D221E8CF-BBA2-449D-8A19-876C27146421",
+            openid="oFfv-sxR2n63-mXBVtFDa9MRBDiI")
         session.add(user1)
         session.add(user2)
         session.add(user3)
         session.add(user4)
         session.add(user5)
         session.add(user6)
+        session.add(user7)
         session.commit()
 
     elif arg == "run":
