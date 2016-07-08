@@ -47,6 +47,8 @@ def run(self, client, user):
             logger.info("Got! " + app["name"])
             
             collected = client.collect_app(app)
+            if collected:
+                logging.getLogger("stat." + user.uid).info(app["down_price"] + "\t" + app["name"])
             remark = "，任务已自动领取了哦！ " if collected else ""
             send_wechat_msg(user.openid, config.got_template, "",
                 first=app["name"],

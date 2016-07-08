@@ -26,6 +26,12 @@ def init_log():
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+    # 统计日志
+    stat_logger = logging.getLogger("stat")
+    ch = logging.FileHandler(config.log_prefix + "stat.txt", "a")
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(formatter)
+    stat_logger.addHandler(ch)
 
 # def init_log(uid):
 #     """日志配置"""
