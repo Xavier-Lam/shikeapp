@@ -5,6 +5,7 @@ import logging
 import re
 
 from celery import Celery
+from celery.schedules import crontab
 
 import config
 from log import init_log
@@ -13,6 +14,13 @@ from shike import ShikeClient
 from wechat import post_template_message, WeChatApiClient
 
 app = Celery("tasks", broker=config.broker, backend=config.backend)
+app.conf.CELERYBEAT_SCHEDULE = {
+    "monitor": {
+        "task": "tasks.monitor",
+        "schedule": crontab(minute="*/5")
+    }
+}
+app.conf.CELERY_REDIRECT_STDOUTS_LEVEL = "DEBUG"
 
 @app.task(bind=True)
 def run(self, client, user):
@@ -56,13 +64,14 @@ def run(self, client, user):
 
 @app.task
 def monitor():
+    pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
+    now = datetime.now()
     with open("errlog.txt") as f:
         lines = f.readlines()
-        pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
         records = list(map(lambda o: re.search(pattern, o).groupdict(), lines))
         for record in records:
             record["date"] = datetime.strptime("2016-" + record["date"], "%Y-%m-%d %H:%M:%S")
-        now = datetime.now()
+
         # 检查过去5分钟的异常数
         excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARN", records))
         num = len(excs)
@@ -75,6 +84,20 @@ def monitor():
         if num > config.alert_num2:
             send_wechat_msg(config.alert_openid, config.alert_template, "",
                 keyword1="warning", keyword2=num, keyword3=excs[-1]["msg"])
+                
+    with open("debuglog.txt") as f:
+        lines = f.readlines()
+        records = list(map(lambda o: re.search(pattern, o).groupdict(), lines))
+        for record in records:
+            record["date"] = datetime.strptime("2016-" + record["date"], "%Y-%m-%d %H:%M:%S")
+        
+        # 检查过去5分钟的日志数
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARN", records))
+        num = len(excs)
+        if num < 10:
+            # 过去5分钟日志数少于10条
+            send_wechat_msg(config.alert_openid, config.alert_template, "",
+                keyword1="terminal", keyword2=num, keyword3=excs[-1]["msg"])
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
