@@ -94,7 +94,7 @@ def monitor():
             record["date"] = datetime.strptime("2016-" + record["date"], "%Y-%m-%d %H:%M:%S")
         
         # 检查过去5分钟的日志数
-        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARN", records))
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5), records))
         num = len(excs)
         if num < 10:
             # 过去5分钟日志数少于10条

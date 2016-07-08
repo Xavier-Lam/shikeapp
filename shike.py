@@ -68,13 +68,13 @@ class ShikeClient(object):
                     "Referer": self.baseaddr + "/shike/appList"
                 })
             rv = resp.json()
+            self.logger.debug("Success: " + resp.text)
         except requests.exceptions.ConnectionError as e:
             self.logger.warning("ConnectionError: " + str(e))
         except Exception as e:
             self.logger.error("UnexceptError: " + str(e))
         if resp.status_code != requests.codes.ok:
             self.logger.error("ServerError: " + resp.text)
-        self.logger.debug("Success: " + resp.text)
         return rv
 
     def filter_apps(self, data):
