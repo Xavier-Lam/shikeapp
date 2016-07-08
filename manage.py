@@ -73,4 +73,4 @@ if __name__ == "__main__":
             client.init()
             run.delay(client, user)
 
-        os.system("celery -A tasks worker --loglevel=info")
+        os.system("celery -A tasks worker -B --loglevel=debug")
