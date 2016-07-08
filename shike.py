@@ -81,7 +81,7 @@ class ShikeClient(object):
         """过滤app"""
         filter_fields = ["name", "file_size_bytes", "order_status_disp", "status",
             "appid", "order_id", "down_price", "bundle_id", "process_name"]
-        availables = filter(lambda x: int(x["order_status_disp"]) > 0, data)
+        availables = filter(lambda x: int(x["order_status_disp"]) > 0 or int(x["status"]) == 0, data)
         availables = map(lambda x: {key: x[key] for key in x if key in filter_fields}, availables)
         availables = list(availables)
         return availables

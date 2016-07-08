@@ -75,7 +75,7 @@ def monitor():
             record["date"] = datetime.strptime("2016-" + record["date"], "%Y-%m-%d %H:%M:%S")
 
         # 检查过去5分钟的异常数
-        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARN", records))
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARNING", records))
         num = len(excs)
         if num > config.alert_num1:
             send_wechat_msg(config.alert_openid, config.alert_template, "",
