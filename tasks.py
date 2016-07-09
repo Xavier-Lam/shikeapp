@@ -84,11 +84,11 @@ def monitor():
             send_wechat_msg(config.alert_openid, config.alert_template, "",
                 keyword1="error", keyword2=num, keyword3=excs[-1]["msg"])
         # 检查关键日志
-        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "CRITICAL", records))
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] == "CRITICAL", records))
         num = len(excs)
         if num > 0:
             send_wechat_msg(config.alert_openid, config.alert_template, "",
-                keyword1="error", keyword2=num, keyword3=excs[-1]["msg"])
+                keyword1="critical", keyword2=num, keyword3=excs[-1]["msg"])
         # 检查过去30分钟的日志数
         excs = filter(lambda o: now - o["date"] < timedelta(minutes=30), records)
         num = len(list(excs))
