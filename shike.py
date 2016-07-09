@@ -136,8 +136,11 @@ class ShikeClient(object):
                 %(app["bundle_id"], self.uid, app["process_name"]),
                 headers={"User-Agent": self.ua})
             data = resp.json()
-        except ValueError:
-            data = {}
+            self.logger.debug("获取应用状态: " + resp.text)
+        except requests.exceptions.ConnectionError as e:
+            self.logger.warning("ConnectionError: " + str(e))
+        except Exception as e:
+            self.logger.error("获取应用状态失败: " + resp.text)
         else:
             flg = data.get("flg")
             if not flg:

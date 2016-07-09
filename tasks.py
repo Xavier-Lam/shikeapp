@@ -59,10 +59,13 @@ def run(self, client, user):
                 
             if collected:
                 delay = config.success_break
-        run.apply_async((client, user), countdown=delay)
     except Exception as e:
         logger.error("An error occured: " + str(e))
-        self.retry(exe=e, countdown=delay)
+        # self.retry(exe=e, countdown=delay)
+    try:
+        run.apply_async((client, user), countdown=delay)
+    except Exception as e:
+        logger.critical("Critical: " + str(e))
 
 @app.task
 def monitor():
@@ -78,6 +81,12 @@ def monitor():
         excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "WARNING", records))
         num = len(excs)
         if num > config.alert_num1:
+            send_wechat_msg(config.alert_openid, config.alert_template, "",
+                keyword1="error", keyword2=num, keyword3=excs[-1]["msg"])
+        # 检查关键日志
+        excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5) and o["level"] != "CRITICAL", records))
+        num = len(excs)
+        if num > 0:
             send_wechat_msg(config.alert_openid, config.alert_template, "",
                 keyword1="error", keyword2=num, keyword3=excs[-1]["msg"])
         # 检查过去30分钟的日志数
