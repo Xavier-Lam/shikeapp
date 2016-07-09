@@ -67,14 +67,14 @@ class ShikeClient(object):
                     "Origin": "http://i.appshike.com",
                     "Referer": self.baseaddr + "/shike/appList"
                 })
+            if resp.status_code != requests.codes.ok:
+                self.logger.error("ServerError: " + resp.text)
             rv = resp.json()
             self.logger.debug("Success: " + resp.text)
         except requests.exceptions.ConnectionError as e:
             self.logger.warning("ConnectionError: " + str(e))
         except Exception as e:
             self.logger.error("UnexceptError: " + str(e))
-        if resp.status_code != requests.codes.ok:
-            self.logger.error("ServerError: " + resp.text)
         return rv
 
     def filter_apps(self, data):
@@ -94,50 +94,56 @@ class ShikeClient(object):
         """领取任务"""
         appid = app["appid"]
         order_id = app["order_id"]
-        resp = self.s.post(self.baseaddr + "/shike/user_click_record", data=dict(
-            appid=appid,
-            user_id=self.uid,
-            order_Id=order_id,
-            t=getnow()
-        ))
-        if resp.text != "0":
-            self.logger.warning("任务领取失败: " + resp.text)
-            return False
+        try:
+            resp = self.s.post(self.baseaddr + "/shike/user_click_record", data=dict(
+                appid=appid,
+                user_id=self.uid,
+                order_Id=order_id,
+                t=getnow()
+            ))
+            if resp.text != "0":
+                self.logger.warning("任务领取失败: " + resp.text)
+                return False
 
-        # 任务领取成功 下一步
-        detail_url = self.baseaddr + "/shike/appDetails/%s/%s/%s?ds=r0"%(appid, order_id, self.id)
-        resp = self.s.get(detail_url, headers={"User-Agent": self.ua})
-        if not re.search(r'id="copy_key"', resp.text):
-            self.logger.warning("进入详情页失败: " + resp.text)
-            return False
-        
-        # 进入详情页成功
-        resp = self.s.get(self.baseaddr + "/shike/copy_keyword", params=dict(
-            appid=appid,
-            user_id=self.uid,
-            order_Id=order_id,
-            t=getnow()
-        ))
-        if resp.text == "0":
-            self.logger.info("领取任务成功! " + app["name"])
-            return True
-        else:
-            self.logger.warning("复制关键词失败: " + resp.text)
+            # 任务领取成功 下一步
+            detail_url = self.baseaddr + "/shike/appDetails/%s/%s/%s?ds=r0"%(appid, order_id, self.id)
+            resp = self.s.get(detail_url, headers={"User-Agent": self.ua})
+            if not re.search(r'id="copy_key"', resp.text):
+                self.logger.warning("进入详情页失败: " + resp.text)
+                return False
+            
+            # 进入详情页成功
+            resp = self.s.get(self.baseaddr + "/shike/copy_keyword", params=dict(
+                appid=appid,
+                user_id=self.uid,
+                order_Id=order_id,
+                t=getnow()
+            ))
+            if resp.text == "0":
+                self.logger.info("领取任务成功! " + app["name"])
+                return True
+            else:
+                self.logger.warning("复制关键词失败: " + resp.text)
+                return False
+        except Exception as e:
+            self.logger.warning("任务领取失败: " + str(e))
             return False
 
     def get_app_status(self, app):
         """获取app状态"""
-        resp = self.s.post(self.baseaddr + "/shike/getAppStatus/%s/%s/%s"
-            %(app["bundle_id"], self.uid, app["process_name"]),
-            headers={"User-Agent": self.ua})
         try:
+            resp = self.s.post(self.baseaddr + "/shike/getAppStatus/%s/%s/%s"
+                %(app["bundle_id"], self.uid, app["process_name"]),
+                headers={"User-Agent": self.ua})
             data = resp.json()
         except ValueError:
             data = {}
-        flg = data.get("flg")
-        if not flg:
-            self.logger.warning("获取应用状态失败: " + resp.text)
-        return flg
+        else:
+            flg = data.get("flg")
+            if not flg:
+                self.logger.warning("获取应用状态失败: " + resp.text)
+            return flg
+        return ""
         
     @property
     def logger(self):
