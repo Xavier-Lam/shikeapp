@@ -17,7 +17,7 @@ got_template = "1__R1cYGbMhB-ucp5cZsRm3pDP92BoTSusTPct7O6pM"
 down_template = "PPhNn2FK9kz1bY689FVyCxFdl4BMVSXMVYYX6gsPOpo"
 
 # 程序配置
-log_prefix = ""
+log_prefix = "logs/"
 broker = "sqla+sqlite:///celerydb.data"
 backend = "db+sqlite:///celerydb_results.data"
 database_str = "sqlite:///data.data"

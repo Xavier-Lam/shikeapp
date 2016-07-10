@@ -105,7 +105,7 @@ def monitor():
         # 检查过去5分钟的日志数
         excs = list(filter(lambda o: now - o["date"] < timedelta(minutes=5), records))
         num = len(excs)
-        if num < 10:
+        if num < 40:
             # 过去5分钟日志数少于10条
             send_wechat_msg(config.alert_openid, config.alert_template, "",
                 keyword1="terminal", keyword2=num, keyword3=excs[-1]["msg"])
