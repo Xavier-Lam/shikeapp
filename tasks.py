@@ -107,8 +107,9 @@ def monitor():
         num = len(excs)
         if num < 40:
             # 过去5分钟日志数少于10条
+            msg = excs[-1]["msg"] if excs else "no msgs"
             send_wechat_msg(config.alert_openid, config.alert_template, "",
-                keyword1="terminal", keyword2=num, keyword3=excs[-1]["msg"])
+                keyword1="terminal", keyword2=num, keyword3=msg)
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
