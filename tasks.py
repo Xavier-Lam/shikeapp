@@ -5,7 +5,7 @@ import logging
 import re
 
 from celery import Celery
-# from celery.exceptions import SoftTimeLimitExceeded
+from celery.exceptions import SoftTimeLimitExceeded
 from celery.schedules import crontab
 
 import config
@@ -23,8 +23,8 @@ app.conf.CELERYBEAT_SCHEDULE = {
 }
 app.conf.CELERY_REDIRECT_STDOUTS_LEVEL = "DEBUG"
 
-@app.task(bind=True, time_limit=20)
-def run(self, client, user):
+@app.task(soft_time_limit=20)
+def run(client, user):
     logger = logging.getLogger("shike." + user.uid)
     delay = config.req_break
     try:
@@ -60,17 +60,17 @@ def run(self, client, user):
                 
             if collected:
                 delay = config.success_break
-    # except SoftTimeLimitExceeded as e:
-    #     logger.error("SoftTimeLimitExceeded: " + str(e))
+    except SoftTimeLimitExceeded as e:
+        logger.error("SoftTimeLimitExceeded: " + str(e), exe_info=True)
     except Exception as e:
-        logger.error("An error occured: " + str(e))
+        logger.error("An error occured: " + str(e), exe_info=True)
         # self.retry(exe=e, countdown=delay)
     try:
         run.apply_async((client, user), countdown=delay)
     except Exception as e:
-        logger.critical("Critical: " + str(e))
+        logger.critical("Critical: " + str(e), exe_info=True)
 
-@app.task(time_limit=60)
+@app.task(soft_time_limit=60)
 def monitor():
     try:
         pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
@@ -114,8 +114,10 @@ def monitor():
                 msg = excs[-1]["msg"] if excs else "no msgs"
                 send_wechat_msg(config.alert_openid, config.alert_template, "",
                     keyword1="terminal", keyword2=num, keyword3=msg)
+    except SoftTimeLimitExceeded as e:
+        logger.error("timelimitexceeded error: " + str(e), exe_info=True)
     except Exception as e:
-        logger.critical("monitor error: " + str(e))
+        logger.critical("monitor error: " + str(e), exe_info=True)
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
