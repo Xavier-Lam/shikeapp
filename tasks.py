@@ -23,7 +23,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
 }
 app.conf.CELERY_REDIRECT_STDOUTS_LEVEL = "DEBUG"
 
-@app.task(soft_time_limit=20)
+@app.task
 def run(client, user):
     logger = logging.getLogger("shike." + user.uid)
     delay = config.req_break
@@ -70,7 +70,7 @@ def run(client, user):
     except Exception as e:
         logger.critical("Critical: " + str(e), exe_info=True)
 
-@app.task(soft_time_limit=60)
+@app.task
 def monitor():
     try:
         pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
