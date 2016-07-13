@@ -5,7 +5,7 @@ import logging
 import re
 
 from celery import Celery
-from celery.exceptions import SoftTimeLimitExceeded
+# from celery.exceptions import SoftTimeLimitExceeded
 from celery.schedules import crontab
 
 import config
@@ -23,7 +23,7 @@ app.conf.CELERYBEAT_SCHEDULE = {
 }
 app.conf.CELERY_REDIRECT_STDOUTS_LEVEL = "DEBUG"
 
-@app.task(bind=True, soft_time_limit=20)
+@app.task(bind=True, time_limit=20)
 def run(self, client, user):
     logger = logging.getLogger("shike." + user.uid)
     delay = config.req_break
@@ -60,8 +60,8 @@ def run(self, client, user):
                 
             if collected:
                 delay = config.success_break
-    except SoftTimeLimitExceeded as e:
-        logger.error("SoftTimeLimitExceeded: " + str(e))
+    # except SoftTimeLimitExceeded as e:
+    #     logger.error("SoftTimeLimitExceeded: " + str(e))
     except Exception as e:
         logger.error("An error occured: " + str(e))
         # self.retry(exe=e, countdown=delay)
@@ -70,7 +70,7 @@ def run(self, client, user):
     except Exception as e:
         logger.critical("Critical: " + str(e))
 
-@app.task(soft_time_limit=20)
+@app.task(time_limit=60)
 def monitor():
     try:
         pattern = r"^\[(?P<level>\w+)\]\s+(?P<name>[^\s]+)\s+(?P<date>\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?P<msg>.+)"
@@ -114,8 +114,8 @@ def monitor():
                 msg = excs[-1]["msg"] if excs else "no msgs"
                 send_wechat_msg(config.alert_openid, config.alert_template, "",
                     keyword1="terminal", keyword2=num, keyword3=msg)
-    except SoftTimeLimitExceeded as e:
-        logger.error("SoftTimeLimitExceeded: " + str(e))
+    except Exception as e:
+        logger.critical("monitor error: " + str(e))
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
