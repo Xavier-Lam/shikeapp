@@ -40,10 +40,10 @@ class ShikeClient(object):
         ))
         # 找到参数r
         if not lxml.html:
-            match = re.search(r"Click_bj[^>]+r=(.*)'.+>", resp.text)
+            match = re.search(r"btn_bjffffff[^>]+r=(.*)'.+>", resp.text)
         else:
             html = lxml.html.fromstring(resp.text)
-            sel = CSSSelector(".Click_bj")
+            sel = CSSSelector(".btn_bjffffff")
             ele = sel(html)[0]
             match = re.search(r"r=(.*)'", ele.attrib["onclick"])
         if not match:

@@ -17,7 +17,7 @@ def init():
 
     session = Session()
 
-    user1 = User(name="xvl", uid="24238285", key="luYFaqqDDeoqDtUA--cmcMVEIVj7zWqUAfSBKnhFN6mMHNPOMUFaT9Ss-Xc-D-cPcHebCpPHgkGFMHLZXlNlSw__",
+    user1 = User(name="xvl", uid="24238285", key="C3D680D6B15EEE17BCB2BF24419A8F82", # key="luYFaqqDDeoqDtUA--cmcMVEIVj7zWqUAfSBKnhFN6mMHNPOMUFaT9Ss-Xc-D-cPcHebCpPHgkGFMHLZXlNlSw__",
         idfa="37B9B63C-FCF7-4D47-854E-FD17D606E300", 
         openid="oFfv-s7eYZ8n7Z6buxKiMhql7ehE")
     # user2 = User(name="yyc", uid="24805851", key="F84630346706B10753B0E8E6EED2DC28",
@@ -38,11 +38,11 @@ def init():
     # user7 = User(name="lft", uid="24260077", key="7DCF1968B8BE79447536C4A015AFD8E5",
     #     idfa="D221E8CF-BBA2-449D-8A19-876C27146421",
     #     openid="oFfv-sxR2n63-mXBVtFDa9MRBDiI")
-    user2 = User(name="tony", uid="25784878", key="Qnfk9CXuzUaH69JE7mlkp-c9QvnLekmbjE7PfqfzDXAk7fEI82o3FDMLKJKicfNl*d5k8tV0BKTsodgby9Mkkg__",
-        idfa="85438CFA-8658-4EC9-95A5-8D83029485C2",
-        openid="oFfv-s7cJiU2lHWsDhpdMNQMXP8o")
+    # user2 = User(name="tony", uid="25784878", key="Qnfk9CXuzUaH69JE7mlkp-c9QvnLekmbjE7PfqfzDXAk7fEI82o3FDMLKJKicfNl*d5k8tV0BKTsodgby9Mkkg__",
+    #     idfa="85438CFA-8658-4EC9-95A5-8D83029485C2",
+    #     openid="oFfv-s7cJiU2lHWsDhpdMNQMXP8o")
     session.add(user1)
-    session.add(user2)
+    # session.add(user2)
     # session.add(user3)
     # session.add(user4)
     # session.add(user5)

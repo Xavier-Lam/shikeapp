@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # 请求配置
-req_break = 15
+req_break = 10
 success_break = 450
 down_break = 300
 
