@@ -38,37 +38,37 @@ def run(client, user):
             flg = client.get_app_status(app)
             if flg == "waitOpen":
                 send_wechat_msg(user.openid, config.down_template, "",
-                    first=app["name"],
+                    first=app.get("name"),
                     remark="请及时打开！")
                 delay = config.down_break
         elif availables:
             # 有应用可供下载
             availables = client.sort_app(availables)
             app = availables[0]
-            logger.info("Got! " + app["name"])
+            logger.info("Got! " + app.get("name"))
             
             collected = client.collect_app(app)
-            if collected:
-                logging.getLogger("stat." + user.uid).info(str(app["down_price"]) + "\t" + app["name"])
+            # if collected:
+            #     logging.getLogger("stat." + user.uid).info(str(app["down_price"]) + "\t" + app["name"])
             remark = "，任务已自动领取了哦！ " if collected else ""
             send_wechat_msg(user.openid, config.got_template, "",
-                first=app["name"],
-                keyword1=app["name"],
-                keyword2=str(int(app["file_size_bytes"])/1024/1024) + "MB",
-                keyword3=app["order_status_disp"],
+                first=app.get("name"),
+                keyword1=app.get("search_word"),
+                keyword2=str(int(app.get("file_size_bytes") or 0)/1024/1024) + "MB",
+                keyword3=app.get("order_status_disp"),
                 remark="一共" + str(len(availables)) + "个应用可供下载" + remark)
                 
             if collected:
                 delay = config.success_break
     except SoftTimeLimitExceeded as e:
-        logger.error("SoftTimeLimitExceeded: " + str(e), exe_info=True)
+        logger.error("SoftTimeLimitExceeded: " + str(e), exc_info=True)
     except Exception as e:
-        logger.error("An error occured: " + str(e), exe_info=True)
+        logger.error("An error occured: " + str(e), exc_info=True)
         # self.retry(exe=e, countdown=delay)
     try:
         run.apply_async((client, user), countdown=delay)
     except Exception as e:
-        logger.critical("Critical: " + str(e), exe_info=True)
+        logger.critical("Critical: " + str(e), exc_info=True)
 
 @app.task(soft_time_limit=60)
 def monitor():
@@ -115,9 +115,9 @@ def monitor():
                 send_wechat_msg(config.alert_openid, config.alert_template, "",
                     keyword1="terminal", keyword2=num, keyword3=msg)
     except SoftTimeLimitExceeded as e:
-        main_logger.error("timelimitexceeded error: " + str(e), exe_info=True)
+        main_logger.error("timelimitexceeded error: " + str(e), exc_info=True)
     except Exception as e:
-        main_logger.critical("monitor error: " + str(e), exe_info=True)
+        main_logger.critical("monitor error: " + str(e), exc_info=True)
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""

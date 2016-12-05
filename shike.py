@@ -52,12 +52,18 @@ class ShikeClient(object):
         token = match.group(1)
         # 转到appList首页
         lasturl = self.baseaddr + "/itry/desktop?r=" + token
-        self.s.get(lasturl, headers={"User-Agent": self.ua})
+        
+        resp = self.s.get(lasturl, headers={"User-Agent": self.ua})
+        match = re.search(r"taskToken:\s*'(.+?)'", resp.text)
+        if not match:
+            self.logger.critical("Init failed!")
+            raise Exception("Init failed!")
+        self.token = match.group(1)
 
     def load_apps(self):
         """加载app列表"""
         # 获取应用列表
-        url = self.baseaddr + "/shike/getApplist/" + self.uid + "/" + self.id
+        url = self.baseaddr + "/shike/getAppV1/" + self.token
         rv = []
         try:
             resp = self.s.post(url, data={"r": getnow()}, 
@@ -79,7 +85,7 @@ class ShikeClient(object):
 
     def filter_apps(self, data):
         """过滤app"""
-        filter_fields = ["name", "file_size_bytes", "order_status_disp", "status",
+        filter_fields = ["name", "file_size_bytes", "order_status_disp", "status", "search_word",
             "appid", "order_id", "down_price", "bundle_id", "process_name"]
         availables = filter(lambda x: int(x["order_status_disp"]) > 0 or int(x["status"]) == 0, data)
         availables = map(lambda x: {key: x[key] for key in x if key in filter_fields}, availables)
@@ -92,35 +98,35 @@ class ShikeClient(object):
 
     def collect_app(self, app):
         """领取任务"""
-        appid = app["appid"]
+        bundle_id = app["bundle_id"]
         order_id = app["order_id"]
         try:
-            resp = self.s.post(self.baseaddr + "/shike/user_click_record", data=dict(
-                appid=appid,
-                user_id=self.uid,
-                order_Id=order_id,
-                t=getnow()
+            self.s.post(self.baseaddr + "/api/write_click_log", data=dict(
+                user_id="log_" + bundle_id + "_464_500"
             ))
+            resp = self.s.post(self.baseaddr + "/shike/user_click_recordV1", data={
+                "pass": bundle_id,
+                "type": "app"
+            })
             if resp.text != "0":
                 self.logger.warning("任务领取失败: " + resp.text)
                 return False
 
             # 任务领取成功 下一步
-            detail_url = self.baseaddr + "/shike/appDetails/%s/%s/%s?ds=r0"%(appid, order_id, self.id)
+            detail_url = self.baseaddr + "/shike/appDetailsV1/%s?ds=r0"%bundle_id
+            app["detail_url"] = detail_url
             resp = self.s.get(detail_url, headers={"User-Agent": self.ua})
             if not re.search(r'id="copy_key"', resp.text):
                 self.logger.warning("进入详情页失败: " + resp.text)
                 return False
             
             # 进入详情页成功
-            resp = self.s.get(self.baseaddr + "/shike/copy_keyword", params=dict(
-                appid=appid,
-                user_id=self.uid,
-                order_Id=order_id,
-                t=getnow()
-            ))
+            resp = self.s.get(self.baseaddr + "/shike/copy_keywordV1", params={
+                "pass": bundle_id,
+                "t": getnow()
+            })
             if resp.text == "0":
-                self.logger.info("领取任务成功! " + app["name"])
+                self.logger.info("领取任务成功! " + app.get("name"))
                 return True
             else:
                 self.logger.warning("复制关键词失败: " + resp.text)
@@ -132,8 +138,7 @@ class ShikeClient(object):
     def get_app_status(self, app):
         """获取app状态"""
         try:
-            resp = self.s.post(self.baseaddr + "/shike/getAppStatus/%s/%s/%s"
-                %(app["bundle_id"], self.uid, app["process_name"]),
+            resp = self.s.post(self.baseaddr + "/shike/getAppStatusV1/%s"%app["bundle_id"],
                 headers={"User-Agent": self.ua})
             data = resp.json()
             self.logger.debug("获取应用状态: " + resp.text)
