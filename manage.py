@@ -17,7 +17,7 @@ def init():
 
     session = Session()
 
-    user1 = User(name="xvl", uid="24238285", key="C3D680D6B15EEE17BCB2BF24419A8F82", # key="luYFaqqDDeoqDtUA--cmcMVEIVj7zWqUAfSBKnhFN6mMHNPOMUFaT9Ss-Xc-D-cPcHebCpPHgkGFMHLZXlNlSw__",
+    user1 = User(name="xvl", uid="24238285", key="C3D680D6B15EEE17BCB2BF24419A8F82", # key="luYFaqqDDeoqDtUA--cmcMVEIVj7zWqUAfSBKnhFN6mMHNPOMUFaT9Ss-Xc-D-cPcHebCpPHgkGFMHLZXlNlSw__", "YgpRlQNyqI5dOn9A-YKYTTvVNXTMPvvQjH7Q8wNnUbx8cmWdGTB77a0UPXfx22vQDK7KA4TC9-ikajn2qtOFgw__"
         idfa="37B9B63C-FCF7-4D47-854E-FD17D606E300", 
         openid="oFfv-s7eYZ8n7Z6buxKiMhql7ehE")
     # user2 = User(name="yyc", uid="24805851", key="F84630346706B10753B0E8E6EED2DC28",

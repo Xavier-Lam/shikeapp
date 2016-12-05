@@ -115,9 +115,9 @@ def monitor():
                 send_wechat_msg(config.alert_openid, config.alert_template, "",
                     keyword1="terminal", keyword2=num, keyword3=msg)
     except SoftTimeLimitExceeded as e:
-        logger.error("timelimitexceeded error: " + str(e), exe_info=True)
+        main_logger.error("timelimitexceeded error: " + str(e), exe_info=True)
     except Exception as e:
-        logger.critical("monitor error: " + str(e), exe_info=True)
+        main_logger.critical("monitor error: " + str(e), exe_info=True)
 
 def send_wechat_msg(openid, template_id, url="", **kwargs):
     """发送微信消息"""
@@ -136,4 +136,4 @@ wechat.on_wechatgranted = lambda resp, *args, **kwargs: main_logger.info("微信
 
 # 初始化日志
 init_log()
-main_logger = logging.getLogger("shike")
+main_logger = logging.getLogger("shike.main")

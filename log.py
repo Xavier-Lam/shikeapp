@@ -33,10 +33,17 @@ class SubFileHandler(logging.Handler):
         handler.emit(record)
 
 def init_log():
-    logger = logging.getLogger("shike")
-    
     formatter = logging.Formatter("[%(levelname)s] %(name)-12s %(asctime)s %(message)s", 
         "%m-%d %H:%M:%S")
+
+    # 一般日志
+    logger = logging.getLogger("shike.main")
+    ch = logging.FileHandler(config.log_prefix + "shike.txt", "a")
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    logger = logging.getLogger("shike")
     # 关键异常处理器
     ch = logging.FileHandler(config.log_prefix + "errlog.txt", "a")
     ch.setLevel(logging.WARNING)
