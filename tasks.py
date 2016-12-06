@@ -45,7 +45,7 @@ def run(client, user):
             # 有应用可供下载
             availables = client.sort_app(availables)
             app = availables[0]
-            logger.info("Got! " + app.get("name"))
+            logger.info("Got! " + str(app.get("name")))
             
             collected = client.collect_app(app)
             # if collected:
