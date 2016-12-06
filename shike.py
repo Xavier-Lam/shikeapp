@@ -126,7 +126,7 @@ class ShikeClient(object):
                 "t": getnow()
             })
             if resp.text == "0":
-                self.logger.info("领取任务成功! " + app.get("name"))
+                self.logger.info("领取任务成功! " + str(app.get("name")))
                 return True
             else:
                 self.logger.warning("复制关键词失败: " + resp.text)

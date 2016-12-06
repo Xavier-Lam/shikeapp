@@ -51,7 +51,7 @@ def run(client, user):
             # if collected:
             #     logging.getLogger("stat." + user.uid).info(str(app["down_price"]) + "\t" + app["name"])
             remark = "，任务已自动领取了哦！ " if collected else ""
-            send_wechat_msg(user.openid, config.got_template, "",
+            send_wechat_msg(user.openid, config.got_template, app["detail_url"],
                 first=app.get("name"),
                 keyword1=app.get("search_word"),
                 keyword2=str(int(app.get("file_size_bytes") or 0)/1024/1024) + "MB",
